@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HybridPay - Payment Gateway</title>
+  <style>
+    :root {
+      --primary: #13b955;
+      --primary-dark: #0f9442;
+      --light-bg: #f5fff8;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 16px rgba(19,185,85,0.09), 0 1.5px 8px rgba(0,0,0,0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: var(--light-bg);
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--box-shadow);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 25px;
+      font-weight: 600;
+    }
+
+    .logo img {
+      width: 44px;
+      height: 44px;
+      margin-right: 13px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(19,185,85,0.15);
+    }
+
+    nav a {
+      margin: 0 12px;
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      transition: 0.3s;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    section {
+      display: none;
+      padding: 40px 20px;
+    }
+
+    #home {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+      background: var(--primary);
+      color: white;
+      font-size: 3rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .form-container {
+      max-width: 470px;
+      margin: 36px auto 0;
+      padding: 34px 30px;
+      border: 1.8px solid var(--primary);
+      border-radius: var(--border-radius);
+      background: #fff;
+      box-shadow: var(--box-shadow);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 22px;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .form-container input {
+      padding: 11px 12px;
+      border: 1.6px solid var(--primary);
+      border-radius: 7px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .payment-options {
+      margin-top: 26px;
+      text-align: center;
+    }
+
+    .payment-method {
+      padding: 13px 18px;
+      border: 1.5px solid var(--primary);
+      margin-bottom: 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      background: #f8fff9;
+      font-size: 1.07rem;
+      font-weight: 500;
+      transition: background 0.15s, box-shadow 0.15s;
+      box-shadow: 0 1px 3px rgba(19,185,85,0.09);
+    }
+
+    .payment-method:hover {
+      background: #e8ffe6;
+      box-shadow: 0 2px 6px rgba(19,185,85,0.13);
+    }
+
+    .payment-display {
+      display: none;
+      margin-top: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      text-align: center;
+    }
+
+    .ceo-story {
+      max-width: 950px;
+      margin: 55px auto;
+      padding: 32px;
+      border-left: 5px solid var(--primary-dark);
+      background: #fff;
+      box-shadow: var(--box-shadow);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: flex-start;
+      gap: 30px;
+    }
+
+    .ceo-story .ceo-img {
+      width: 200px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    footer {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: white;
+      text-align: center;
+      padding: 22px 0;
+      margin-top: 40px;
+      font-size: 1.1rem;
+    }
+
+    /* POPUPS (LOGIN, WALLET, CEO) */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      box-shadow: var(--box-shadow);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1.5px solid var(--primary);
+      border-radius: 8px;
+    }
+
+    .modal-btn {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .modal-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .close-btn {
+      background: #ccc;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Wallet Styling */
+    #walletBalance {
+      font-size: 1.5rem;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    #transactions {
+      text-align: left;
+      margin-top: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    #transactions p {
+      margin: 5px 0;
+    }
+
+    .ceo-link {
+      color: rgb(2, 107, 46);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="HybridPay Logo" />
+      HybridPay
+    </div>
+    <nav>
+      <a onclick="showPage('home')">🏠 Home</a>
+      <a onclick="showPage('services')">💼 Services</a>
+      <a onclick="openLogin()">🔐 Login</a>
+      <a onclick="showPage('contact')">📞 Contact</a>
+    </nav>
+  </header>
+
+  <section id="home">HYBRIDPAY</section>
+
+  <section id="services">
+    <div class="form-container">
+      <h2>Register for HybridPay</h2>
+      <input type="text" placeholder="First Name" />
+      <input type="text" placeholder="Last Name" />
+      <input type="text" placeholder="Other Name" />
+      <input type="text" placeholder="Receiver's Name" />
+
+      <div class="payment-options">
+        <h3>Choose Payment Method</h3>
+        <div class="payment-method" id="cardOption">💳 Pay with Card</div>
+        <div class="payment-method" id="bankOption">🏦 Bank Transfer</div>
+        <div class="payment-method" id="ussdOption">📱 USSD Payment</div>
+
+        <div class="payment-display" id="cardDisplay">
+          <h4>Enter Your Card Details</h4>
+          <input type="text" placeholder="Card Number" />
+        </div>
+        <div class="payment-display" id="bankDisplay">
+          <h4>Bank Transfer Details</h4>
+          <p>GTBank - 0208663774 - Fadunmila Damilola</p>
+        </div>
+        <div class="payment-display" id="ussdDisplay">
+          <h4>USSD Payment</h4>
+          <p>Dial *737# for GTBank</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ceo-story">
+      <img src="images/ceo.png" alt="CEO of HybridPay" class="ceo-img" />
+      <div>
+        <h2>About Our CEO</h2>
+        <p>
+          HybridPay was founded under the visionary leadership of
+          <b class="ceo-link" onclick="openCeo()">Fadunmila Damilola Olawale</b>,
+          a forward-thinking entrepreneur with a passion for financial technology and innovation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p>📞 +2348027087572</p>
+    <p>✉ hybridtechnology6@gmail.com</p>
+    <p>📍 Lagos, Nigeria</p>
+  </section>
+
+  <!-- LOGIN POPUP -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <h3>Login to HybridPay</h3>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button class="modal-btn" onclick="loginUser()">Login</button>
+      <br />
+      <button class="close-btn" onclick="closeLogin()">Close</button>
+    </div>
+  </div>
+
+  <!-- WALLET POPUP -->
+  <div class="modal" id="walletModal">
+    <div class="modal-content">
+      <h3>Welcome, <span id="walletUser"></span></h3>
+      <div id="walletBalance">₦0.00</div>
+      <input type="number" id="amount" placeholder="Enter Amount" />
+      <button class="modal-btn" onclick="topUp()">Top Up</button>
+      <button class="modal-btn" onclick="withdraw()">Withdraw</button>
+      <div id="transactions"></div>
+      <button class="close-btn" onclick="closeWallet()">Close</button>
+    </div>
+  </div>
+
+  <!-- CEO POPUP -->
+  <div class="modal" id="ceoModal">
+    <div class="modal-content">
+      <h3>Fadunmila Damilola Olawale</h3>
+      <p>Founder & CEO of HybridPay</p>
+      <p>Email: hybridtechnology6@gmail.com</p>
+      <p>Contact: +2348027087572</p>
+      <p>Location: Lagos, Nigeria</p>
+      <button class="close-btn" onclick="closeCeo()">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    Contact us: +2348027087572 | hybridtechnology6@gmail.com
+  </footer>
+
+  <script>
+    // PAGE SWITCH
+    function showPage(id) {
+      document.querySelectorAll("section").forEach((s) => (s.style.display = "none"));
+      document.getElementById(id).style.display = "block";
+    }
+
+    // LOGIN MODAL
+    const loginModal = document.getElementById("loginModal");
+    function openLogin() { loginModal.style.display = "flex"; }
+    function closeLogin() { loginModal.style.display = "none"; }
+
+    // WALLET MODAL
+    const walletModal = document.getElementById("walletModal");
+    let balance = 0;
+    const transactions = [];
+
+    function loginUser() {
+      const user = document.getElementById("username").value.trim();
+      if (user === "") { alert("Enter a valid username"); return; }
+      document.getElementById("walletUser").innerText = user;
+      closeLogin();
+      walletModal.style.display = "flex";
+      updateWallet();
+    }
+
+    function topUp() {
+      const amt = parseFloat(document.getElementById("amount").value);
+      if (!amt || amt <= 0) return alert("Enter a valid amount");
+      balance += amt;
+      transactions.unshift(`+₦${amt.toLocaleString()} Top-up on ${new Date().toLocaleString()}`);
+      updateWallet();
+    }
+
+    function withdraw() {
+      const amt = parseFloat(document.getElementById("amount").value);
+      if (!amt || amt <= 0) return alert("Enter a valid amount");
+      if (amt > balance) return alert("Insufficient balance");
+      balance -= amt;
+      transactions.unshift(`-₦${amt.toLocaleString()} Withdrawal on ${new Date().toLocaleString()}`);
+      updateWallet();
+    }
+
+    function updateWallet() {
+      document.getElementById("walletBalance").innerText = `₦${balance.toLocaleString(undefined,{minimumFractionDigits:2})}`;
+      const tDiv = document.getElementById("transactions");
+      tDiv.innerHTML = "<h4>Transaction History</h4>" + (transactions.length ? transactions.map(t => `<p>${t}</p>`).join("") : "<p>No transactions yet.</p>");
+    }
+
+    function closeWallet() { walletModal.style.display = "none"; }
+
+    // CEO POPUP
+    const ceoModal = document.getElementById("ceoModal");
+    function openCeo() { ceoModal.style.display = "flex"; }
+    function closeCeo() { ceoModal.style.display = "none"; }
+
+    // PAYMENT DISPLAY SWITCH
+    const hideDisplays = () =>
+      document.querySelectorAll(".payment-display").forEach((d) => (d.style.display = "none"));
+    document.getElementById("cardOption").onclick = () => { hideDisplays(); document.getElementById("cardDisplay").style.display = "block"; };
+    document.getElementById("bankOption").onclick = () => { hideDisplays(); document.getElementById("bankDisplay").style.display = "block"; };
+    document.getElementById("ussdOption").onclick = () => { hideDisplays(); document.getElementById("ussdDisplay").style.display = "block"; };
+
+    // DEFAULT PAGE
+    showPage("home");
+  </script>
+</body>
+</html>
